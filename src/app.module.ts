@@ -9,13 +9,12 @@ import { StatusModule } from './status/status.module';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { CustomerModule } from './customer/customer.module';
 
-
 @Module({
   imports: [
     // Import ConfigModule with global config. No need to import in other modules
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration]
+      load: [configuration],
     }),
     // Import CoreModule with global config. If you need to set different labels in different modules,
     // then you can import in other modules with correct label set.
@@ -25,7 +24,7 @@ import { CustomerModule } from './customer/customer.module';
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
         ttl: configService.get('app.cache.ttl'),
-        max: configService.get('app.cache.maxCount')
+        max: configService.get('app.cache.maxCount'),
       }),
       inject: [ConfigService],
     }),
@@ -33,20 +32,24 @@ import { CustomerModule } from './customer/customer.module';
     CustomerModule,
     MongooseModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
-        const mongoMemoryReplicaSetServer = await MongoMemoryReplSet.create({ replSet: { count: 4 } })
-        console.log(`MongoDB-In-Memory server available at URI: ${mongoMemoryReplicaSetServer.getUri()}`)
+        const mongoMemoryReplicaSetServer = await MongoMemoryReplSet.create({
+          replSet: { count: 4 },
+        });
+        console.log(
+          `MongoDB-In-Memory server available at URI: ${mongoMemoryReplicaSetServer.getUri()}`,
+        );
         return {
-          uri: mongoMemoryReplicaSetServer.getUri(),
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          serverSelectionTimeoutMS: 50,
-          connectTimeoutMS: 50,
-        }
+          uri: 'mongodb://127.0.0.1:27017/nestSkeleton',
+          // useNewUrlParser: true,
+          // useUnifiedTopology: true,
+          // serverSelectionTimeoutMS: 50,
+          // connectTimeoutMS: 50,
+        };
       },
       inject: [ConfigService],
-    })
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
